@@ -6,6 +6,7 @@
     <title>Art Gallery Showcase - Demo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         /* Custom styles */
         body {
@@ -30,6 +31,71 @@
         .gallery-item:hover {
              box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2); /* Add shadow on hover */
         }
+
+        /* Mini-Game Specific Styles */
+        #mini-game {
+            background: linear-gradient(45deg, #ff00ff, #00ffff, #ffff00); /* Neon gradient background */
+            color: #fff; /* White text for contrast */
+            font-family: 'Press Start 2P', cursive; /* Arcade font */
+            text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #0ff, 0 0 20px #0ff, 0 0 25px #0ff, 0 0 30px #0ff, 0 0 35px #0ff; /* Neon text shadow */
+        }
+
+        #mini-game h2 {
+            font-family: 'Press Start 2P', cursive; /* Ensure game heading uses arcade font */
+            color: #fff; /* White heading */
+             text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #0ff, 0 0 20px #0ff, 0 0 25px #0ff, 0 0 30px #0ff, 0 0 35px #0ff; /* Neon text shadow */
+        }
+
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)); /* Responsive grid of squares */
+            gap: 10px; /* Space between squares */
+            max-width: 400px; /* Max width for the game area */
+            margin: 20px auto; /* Center the grid */
+        }
+
+        .game-square {
+            width: 50px;
+            height: 50px;
+            background-color: rgba(255, 255, 255, 0.2); /* Semi-transparent default */
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+            box-shadow: 0 0 5px rgba(255, 255, 255, 0.5); /* Subtle initial shadow */
+        }
+
+        .game-square:hover {
+            transform: scale(1.05); /* Slight scale on hover */
+        }
+
+        /* Neon Colors for the game squares */
+        .color-1 { background-color: #ff00ff; box-shadow: 0 0 5px #ff00ff, 0 0 10px #ff00ff, 0 0 15px #ff00ff; } /* Magenta */
+        .color-2 { background-color: #00ffff; box-shadow: 0 0 5px #00ffff, 0 0 10px #00ffff, 0 0 15px #00ffff; } /* Cyan */
+        .color-3 { background-color: #ffff00; box-shadow: 0 0 5px #ffff00, 0 0 10px #ffff00, 0 0 15px #ffff00; } /* Yellow */
+        .color-4 { background-color: #00ff00; box-shadow: 0 0 5px #00ff00, 0 0 10px #00ff00, 0 0 15px #00ff00; } /* Green */
+        .color-5 { background-color: #ff8000; box-shadow: 0 0 5px #ff8000, 0 0 10px #ff8000, 0 0 15px #ff8000; } /* Orange */
+
+         /* Style for game buttons */
+        .game-button {
+            font-family: 'Press Start 2P', cursive;
+            padding: 10px 20px;
+            border-radius: 5px;
+            background-color: #fff;
+            color: #333;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+            margin-top: 20px;
+            text-shadow: none; /* Remove neon shadow from button text */
+        }
+
+        .game-button:hover {
+            background-color: #eee;
+            transform: translateY(-2px);
+        }
+
+
     </style>
 </head>
 <body class="bg-gray-100">
@@ -41,6 +107,7 @@
             <nav class="hidden md:flex space-x-6">
                 <a href="#gallery" class="text-gray-600 hover:text-gray-800 transition duration-300">Gallery</a>
                 <a href="#exhibitions" class="text-gray-600 hover:text-gray-800 transition duration-300">Exhibitions</a>
+                 <a href="#mini-game" class="text-gray-600 hover:text-gray-800 transition duration-300">Mini Game</a>
                 <a href="#about" class="text-gray-600 hover:text-gray-800 transition duration-300">About</a>
                 <a href="#contact" class="text-gray-600 hover:text-gray-800 transition duration-300">Contact</a>
             </nav>
@@ -134,6 +201,19 @@
         </div>
     </section>
 
+    <section id="mini-game" class="py-16 text-center">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl md:text-4xl font-bold mb-8">Play Our Neon Game!</h2>
+            <p class="text-lg mb-8">Click the squares to change their colors and create a dazzling display!</p>
+
+            <div id="game-area" class="game-grid">
+                </div>
+
+             <button id="reset-game" class="game-button">Reset Game</button>
+        </div>
+    </section>
+
+
      <section id="contact" class="py-16 bg-white">
         <div class="container mx-auto px-6 text-center">
             <h2 class="text-3xl md:text-4xl font-bold mb-8">Get in Touch</h2>
@@ -186,6 +266,70 @@
             `;
             document.body.appendChild(messageBox);
         }
+
+
+        // Mini-Game JavaScript Logic
+        const gameArea = document.getElementById('game-area');
+        const resetButton = document.getElementById('reset-game');
+        const numberOfSquares = 40; // Number of squares in the game grid
+        const colors = ['color-1', 'color-2', 'color-3', 'color-4', 'color-5']; // CSS classes for neon colors
+
+        // Function to create the game grid
+        function createGameGrid() {
+            gameArea.innerHTML = ''; // Clear existing squares
+            for (let i = 0; i < numberOfSquares; i++) {
+                const square = document.createElement('div');
+                square.classList.add('game-square');
+                // Optionally add a random initial color
+                // const randomColorClass = colors[Math.floor(Math.random() * colors.length)];
+                // square.classList.add(randomColorClass);
+                gameArea.appendChild(square);
+            }
+        }
+
+        // Function to handle square clicks
+        function handleSquareClick(event) {
+            const clickedSquare = event.target;
+            if (clickedSquare.classList.contains('game-square')) {
+                // Find the current color class
+                let currentColorClass = null;
+                for (const colorClass of colors) {
+                    if (clickedSquare.classList.contains(colorClass)) {
+                        currentColorClass = colorClass;
+                        break;
+                    }
+                }
+
+                // Determine the next color class
+                let nextColorClass;
+                if (currentColorClass) {
+                    const currentIndex = colors.indexOf(currentColorClass);
+                    const nextIndex = (currentIndex + 1) % colors.length;
+                    nextColorClass = colors[nextIndex];
+                    clickedSquare.classList.remove(currentColorClass); // Remove current
+                } else {
+                    // If no color class, add the first one
+                    nextColorClass = colors[0];
+                }
+
+                // Add the next color class
+                clickedSquare.classList.add(nextColorClass);
+            }
+        }
+
+        // Initialize the game grid on page load
+        window.addEventListener('load', () => {
+            createGameGrid();
+        });
+
+        // Add event listener to the game area for clicks (event delegation)
+        gameArea.addEventListener('click', handleSquareClick);
+
+        // Add event listener for the reset button
+        resetButton.addEventListener('click', () => {
+            createGameGrid(); // Recreate the grid to reset colors
+        });
+
 
     </script>
 
